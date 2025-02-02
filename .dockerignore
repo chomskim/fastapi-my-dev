@@ -1,0 +1,15 @@
+.env
+.git
+.gitignore
+__pycache__/
+README.md
+*.md
+nginx
+*.service
+docker-compose*.yml
+Dockerfile
+alembic.ini
+alembic/
+.vscode/
+.vscodeserver/
+
