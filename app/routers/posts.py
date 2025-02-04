@@ -1,9 +1,10 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy import func
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
-from ..database import get_db
 from .. import models, schemas, oauth2
+from ..database import get_db
+
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
@@ -37,7 +38,7 @@ def create_post(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    print(f"current_user: {current_user.to_dict()}")
+    # print(f"current_user: {current_user.to_dict()}")
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -50,13 +51,19 @@ def create_post(
     return new_post
 
 
-@router.get("/{id}", response_model=schemas.Post)
+@router.get("/{id}", response_model=schemas.PostOut)
 def get_post(
     id: int,
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = (
+        db.query(models.Post, func.count(models.Vote.post_id).label("votes"))
+        .join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True)
+        .group_by(models.Post.id)
+        .filter(models.Post.id == id)
+        .first()
+    )
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -110,6 +117,6 @@ def update_post(
             detail=f"User {current_user.id} not authorized to update this post",
         )
     updated_count = post_query.update(post.dict(), synchronize_session=False)
-    print(type(updated_count), updated_count)
+    # print(type(updated_count), updated_count)
     db.commit()
     return post_query.first()

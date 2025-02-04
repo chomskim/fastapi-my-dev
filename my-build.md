@@ -279,6 +279,21 @@ docker compose -f docker-compose-dev.yml down
  ✔ Container fastapi-my-dev-api-1  Removed                                                                       0.6s 
  ✔ Network fastapi-my-dev_default  Removed                                                                       0.2s 
 
+# Upload fastapi image to DockerHub
+docker login
+docker tag fastapi chomskim/fastapi
+docker push chomskim/fastapi
 
 ```
+
+## PyTest
+
+```sh
+pytest -p --disable-warnings
+pytest -v -s --disable-warnings  # -s for print() output
+pytest -v -s -x --disable-warnings # stop after fail 
+pytest -v -s --disable-warnings tests/test_users.py
+
+```
+
 

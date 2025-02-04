@@ -2,10 +2,10 @@ version: "3"
 services:
     api:
         image: payal03/fastapi
-        depends_on:
-            - postgres
+        # depends_on:
+        #     - postgres
         ports:
-            - 80:10000
+            - 80:8000
         environment:
             - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
             - DATABASE_PORT=${DATABASE_PORT}
@@ -18,14 +18,14 @@ services:
             - DRIVER=${DRIVER}
 
         
-    postgres:
-        image: postgres
-        environment:
-            - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-            - POSTGRES_DB=${DATABASE_NAME}
+#     postgres:
+#         image: postgres
+#         environment:
+#             - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+#             - POSTGRES_DB=${DATABASE_NAME}
 
-        volumes:
-            - postgres-db:/var/lib/postgresql/data
+#         volumes:
+#             - postgres-db:/var/lib/postgresql/data
 
-volumes:
-    postgres-db:
+# volumes:
+#     postgres-db:

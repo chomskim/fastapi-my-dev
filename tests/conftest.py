@@ -6,11 +6,12 @@ from sqlalchemy.orm import sessionmaker
 from app.config import settings
 from app.database import get_db
 from app import models
-from alembic import command
+
+# from alembic import command
 from app.oauth2 import create_access_token
 
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}_test"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@localhost:{settings.database_port}/{settings.database_name}_test"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
@@ -19,8 +20,10 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 client = TestClient(app)
 
 
-@pytest.fixture
+# @pytest.fixture(scope="session")
+@pytest.fixture  # default scope is function -- you can use same user for multiple tests
 def session():
+    # print("Creating session fixture")
     models.Base.metadata.drop_all(bind=engine)
     models.Base.metadata.create_all(bind=engine)
     try:
@@ -35,20 +38,24 @@ def client(session):
     # command.upgrade("head")
     # command.downgrade("base")
     def override_get_db():
+
         try:
             yield session
         finally:
             session.close()
 
+    # models.Base.metadata.create_all(bind=engine)
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
+    # models.Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def test_user1(client):
-    user_data = {"email": "random@mail.com", "password": "123"}
-    res = client.post("/users", json=user_data)
+    user_data = {"email": "user1@gmail.com", "password": "password123"}
+    res = client.post("/users/", json=user_data)
     assert res.status_code == 201
+
     new_user = res.json()
     new_user["password"] = user_data["password"]
     return new_user
@@ -57,8 +64,9 @@ def test_user1(client):
 @pytest.fixture
 def test_user2(client):
     user_data = {"email": "user2@mail.com", "password": "password123"}
-    res = client.post("/users", json=user_data)
+    res = client.post("/users/", json=user_data)
     assert res.status_code == 201
+
     new_user = res.json()
     new_user["password"] = user_data["password"]
     return new_user

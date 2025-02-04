@@ -4,7 +4,7 @@ from app import schemas
 def test_get_all_posts(authorized_client, test_posts):
     res = authorized_client.get("/posts/")
     post_list = [schemas.PostOut(**post) for post in res.json()]
-    print(post_list)
+    # print(post_list)
     assert(len(res.json())) == len(test_posts)
     assert res.status_code == 200
 
@@ -14,18 +14,27 @@ def test_unauthorized_user_get_all_posts(client, test_posts):
 
     assert res.status_code == 401
 
+def test_unauthorized_user_get_one_post(client, test_posts):
+    res = client.get(f"/posts/{test_posts[0].id}")
+
+    assert res.status_code == 401
 
 def test_get_non_existing_post(authorized_client, test_posts):
-    res = authorized_client.get(f"/posts/{111111101}")
+    res = authorized_client.get("/posts/9999")
     
     assert res.status_code == 404
 
 
 def test_get_post_by_id(authorized_client, test_posts):
     res = authorized_client.get(f"/posts/{test_posts[0].id}")
+    # print(f"id: {test_posts[0].id} type: {type(test_posts[0].id)}")
+    print(f"res.json(): {res.json()}")
     post = schemas.PostOut(**res.json())
+    print(f"post: {post}")
 
     assert post.Post.id == test_posts[0].id
+    assert post.Post.title == test_posts[0].title
+    assert post.Post.content == test_posts[0].content
     assert res.status_code == 200
 
 
@@ -103,7 +112,7 @@ def test_update_post(authorized_client, test_user1, test_posts):
     res = authorized_client.put(f"/posts/{test_posts[0].id}", json=post_data)
     updated_post = schemas.Post(**res.json())
 
-    assert res.status_code == 202
+    assert res.status_code == 200
     assert updated_post.title == post_data["title"]
     assert updated_post.content == post_data["content"]
 
@@ -116,6 +125,15 @@ def test_update_other_user_post(authorized_client, test_user1, test_posts):
     res = authorized_client.put(f"/posts/{test_posts[3].id}", json=post_data)
     assert res.status_code == 403
     
+def test_unauthorized_user_update_post(client, test_user1, test_posts):
+    post_data = {
+        "title": "updated title",
+        "content": "updated content",
+        "published": True
+    }
+    res = client.put(f"/posts/{test_posts[0].id}", json=post_data)
+
+    assert res.status_code == 401
 
 def test_update_post_non_exist(authorized_client, test_user1, test_posts):
     post_data = {
