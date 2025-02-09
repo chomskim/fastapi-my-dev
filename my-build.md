@@ -56,9 +56,11 @@ pm.environment.set("JWT", pm.response.json().access_token);
 ## Alembic
 
 ```sh
-alembic init albembic
+alembic init alembic
 
-alembic revision -m "create start"
+edit alembic/env.py
+
+alembic revision -m "start empty"
 Generating /home/cskim/git-repo/fastapi-project1/albembic/versions/9220749ef457_create_start.py ...  done
 
 alembic current

@@ -9,7 +9,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
-    new_user = models.User(**user.dict())
+    new_user = models.User(**user.model_dump())
     # if user already exists raise error
     check_user = (
         db.query(models.User).filter(models.User.email == new_user.email).first()

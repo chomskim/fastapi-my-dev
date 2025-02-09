@@ -90,7 +90,7 @@ def root():
 #     # )
 #     # new_post = cursor.fetchone()
 #     # conn.commit()
-#     new_post = models.Post(**post.dict())
+#     new_post = models.Post(**post.model_dump())
 #     db.add(new_post)
 #     db.commit()
 #     db.refresh(new_post)
@@ -145,7 +145,7 @@ def root():
 #     # )
 #     # updated_post = cursor.fetchone()   
 #     # conn.commit()
-#     print(post.dict())
+#     print(post.model_dump())
 #     post_query = db.query(models.Post).filter(models.Post.id == id)
 #     updated_post = post_query.first()
 #     print(type(updated_post.id), updated_post.title, updated_post.content, updated_post.published)
@@ -154,7 +154,7 @@ def root():
 #             status_code=status.HTTP_404_NOT_FOUND,
 #             detail=f"Post with id: {id} was not found",
 #         )
-#     updated_count = post_query.update(post.dict(), synchronize_session=False)
+#     updated_count = post_query.update(post.model_dump(), synchronize_session=False)
 #     print(type(updated_count), updated_count)
 #     db.commit()
 #     # db.refresh(updated_post)
@@ -191,7 +191,7 @@ def root():
 #     hashed_password = hash(user.password)
 #     user.password = hashed_password
 
-#     new_user = models.User(**user.dict())
+#     new_user = models.User(**user.model_dump())
 #     db.add(new_user)
 #     db.commit()
 #     db.refresh(new_user)

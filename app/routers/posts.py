@@ -44,7 +44,7 @@ def create_post(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"User not authenticated",
         )
-    new_post = models.Post(owner_id=current_user.id, **post.dict())
+    new_post = models.Post(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -102,7 +102,7 @@ def update_post(
     db: Session = Depends(get_db),
     current_user: schemas.UserOut = Depends(oauth2.get_current_user),
 ):
-    print(post.dict())
+    print(post.model_dump())
     post_query = db.query(models.Post).filter(models.Post.id == id)
     updated_post = post_query.first()
 
@@ -116,7 +116,7 @@ def update_post(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"User {current_user.id} not authorized to update this post",
         )
-    updated_count = post_query.update(post.dict(), synchronize_session=False)
+    updated_count = post_query.update(post.model_dump(), synchronize_session=False)
     # print(type(updated_count), updated_count)
     db.commit()
     return post_query.first()
