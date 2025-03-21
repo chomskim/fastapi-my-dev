@@ -298,4 +298,8 @@ pytest -v -s --disable-warnings tests/test_users.py
 
 ```
 
+## Delete Zone.Identifier
 
+```sh
+find . -name "*:Zone.Identifier" -delete
+```
